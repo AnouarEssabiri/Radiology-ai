@@ -120,9 +120,21 @@ async def startup_event():
         logger.warning("Model pre-load failed (will retry on first request): %s", exc)
 
 
+# ─── Frontend ─────────────────────────────────────────────────────────────────
+@app.get("/", tags=["Frontend"])
+async def serve_index():
+    """Serve the frontend index.html"""
+    frontend_dir = Path(__file__).parent.parent / "frontend"
+    return FileResponse(frontend_dir / "index.html")
+
 # ─── Health ───────────────────────────────────────────────────────────────────
 @app.get("/health", tags=["System"])
 async def health_check():
+    return {"status": "ok", "version": "1.0.0"}
+
+@app.get("/healthz", tags=["System"])
+async def healthz_check():
+    """Health check endpoint for Render monitoring"""
     return {"status": "ok", "version": "1.0.0"}
 
 

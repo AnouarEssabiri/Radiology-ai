@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: radiology-ai
+    env: python
+    plan: free
+    region: virginia
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port 10000
+    healthCheckPath: /healthz
+    autoDeploy: true
+    autoDeployTrigger:
+      type: commit
+    buildFilter:
+      includedPaths:
+        - "**/*.py"
+        - "**/*.yaml"
+        - "**/*.txt"
+        - "**/*.html"
+      ignoredPaths:
+        - "**/datasets/**"
+        - "**/logs/**"
+        - "**/notebooks/**"
+        - "**/tmp/**"
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CONFIG_PATH
+        value: config/config.yaml
