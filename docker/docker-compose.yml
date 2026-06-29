@@ -1,0 +1,62 @@
+# ============================================================
+# RadiologyAI – Docker Compose
+# ============================================================
+# Services:
+#   backend  – FastAPI inference API
+#   frontend – Nginx serving the React frontend
+# ============================================================
+
+version: "3.9"
+
+services:
+
+  # ── Backend API ────────────────────────────────────────────
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: radiology-ai-backend:latest
+    container_name: radai_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist model checkpoints and uploads between restarts
+      - ../ai_model/checkpoints:/app/ai_model/checkpoints
+      - ../backend/uploads:/app/backend/uploads
+      - ../datasets:/app/datasets
+      - ../logs:/app/logs
+    environment:
+      - CONFIG_PATH=config/config.yaml
+      - PYTHONUNBUFFERED=1
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]   # Remove if no GPU
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Frontend ────────────────────────────────────────────────
+  frontend:
+    image: nginx:1.25-alpine
+    container_name: radai_frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ../frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  checkpoints:
+  uploads:

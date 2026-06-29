@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+.env.docker.example
+.env.example
+# Data (large files)
+datasets/raw/
+datasets/processed/images/
+datasets/processed/reports/
+datasets/processed/*.pkl
+datasets/processed/*.json
+datasets/chest_xray/
+
+# Model checkpoints (large)
+ai_model/checkpoints/*.pth
+
+# Uploads / Outputs
+backend/uploads/
+!backend/uploads/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb.bak
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker/.env
+
+# Secrets
+.env
+*.key
+kaggle.json

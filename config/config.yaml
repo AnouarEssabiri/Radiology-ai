@@ -1,0 +1,145 @@
+# =============================================================
+# RadiologyAI - Master Configuration
+# =============================================================
+
+project:
+  name: "RadiologyAI"
+  version: "1.0.0"
+  description: "Automatic Radiology Report Generation using Deep Learning"
+
+# ----------------------------
+# Dataset Configuration
+# ----------------------------
+dataset:
+  name: "openI"           # options: openI, mimic_cxr, kaggle
+  image_size: 224
+  max_seq_len: 150        # max tokens for generated reports
+  min_freq: 3             # min word frequency for vocabulary
+  train_split: 0.80
+  val_split:   0.10
+  test_split:  0.10
+  num_workers: 4
+  pin_memory: true
+
+  paths:
+    raw_data:      "datasets/raw/"
+    processed:     "datasets/processed/"
+    images:        "datasets/processed/images/"
+    reports:       "datasets/processed/reports/"
+    vocab:         "datasets/processed/vocab.pkl"
+    annotations:   "datasets/processed/annotations.json"
+
+# ----------------------------
+# Model Architecture
+# ----------------------------
+model:
+  name: "EfficientNetTransformer"   # options: EfficientNetTransformer, ViTTransformer, ResNetLSTM
+  encoder: "efficientnet_b3"        # torchvision backbone
+  d_model: 512
+  num_heads: 8
+  num_decoder_layers: 6
+  dim_feedforward: 2048
+  dropout: 0.1
+  max_seq_len: 150
+  pretrained_encoder: false   # set true once internet is available for download
+
+# ----------------------------
+# Training Configuration
+# ----------------------------
+training:
+  epochs: 50
+  batch_size: 32
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-5
+  label_smoothing: 0.1
+  clip_grad_norm: 1.0
+  warmup_steps: 500
+  mixed_precision: true           # FP16 training (requires CUDA)
+  early_stopping_patience: 7
+  checkpoint_dir: "ai_model/checkpoints/"
+  best_model_path: "ai_model/checkpoints/best_model.pth"
+  log_interval: 50                # steps between log prints
+
+  scheduler:
+    name: "cosine"                # options: cosine, step, reduce_on_plateau
+    T_max: 50
+    eta_min: 1.0e-6
+
+  augmentation:
+    enabled: true
+    horizontal_flip: 0.5
+    rotation_degrees: 10
+    brightness: 0.2
+    contrast: 0.2
+    gaussian_blur: 0.1
+
+# ----------------------------
+# Generation / Inference
+# ----------------------------
+inference:
+  beam_size: 5                    # beam search width
+  max_len: 150
+  min_len: 20
+  temperature: 1.0
+  repetition_penalty: 1.3
+  confidence_threshold: 0.5
+
+# ----------------------------
+# Evaluation Metrics
+# ----------------------------
+evaluation:
+  bleu_weights:
+    bleu1: [1.0, 0.0, 0.0, 0.0]
+    bleu2: [0.5, 0.5, 0.0, 0.0]
+    bleu3: [0.33, 0.33, 0.33, 0.0]
+    bleu4: [0.25, 0.25, 0.25, 0.25]
+  compute_meteor: true
+  compute_rouge: true
+  compute_cider: false            # requires extra library
+
+# ----------------------------
+# Backend / API
+# ----------------------------
+api:
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  reload: false
+  workers: 1
+  upload_dir: "backend/uploads/"
+  max_file_size_mb: 20
+  allowed_extensions: [".jpg", ".jpeg", ".png", ".dcm"]
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+    - "http://127.0.0.1:3000"
+
+# ----------------------------
+# Explainability
+# ----------------------------
+explainability:
+  gradcam_layer: "encoder.features.7"   # last conv layer of EfficientNet
+  colormap: "jet"
+  alpha: 0.5                             # overlay opacity
+  output_dir: "backend/uploads/gradcam/"
+
+# ----------------------------
+# LLM Integration
+# ----------------------------
+llm:
+  enabled: true                          # Use LLM for report generation
+  provider: "groq"                       # options: groq, openai (future)
+  model: "llama-3.3-70b-versatile"       # Groq model to use
+  api_key: ""                            # Set via GROQ_API_KEY environment variable
+  max_tokens: 500                        # Max tokens for generated report
+  temperature: 0.7                       # Temperature for generation
+  system_prompt: "You are a highly skilled radiologist. Generate a clear, professional radiology report based on the chest X-ray findings. Include both Findings and Impression sections. Keep it concise and clinically accurate."
+
+# ----------------------------
+# Logging
+# ----------------------------
+logging:
+  level: "INFO"                          # DEBUG | INFO | WARNING | ERROR
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  log_file: "logs/radiology_ai.log"
+  tensorboard_dir: "logs/tensorboard/"
