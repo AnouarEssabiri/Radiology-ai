@@ -2,8 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install git and git-lfs
-RUN apt-get update && apt-get install -y git git-lfs && rm -rf /var/lib/apt/lists/*
+# Install git, git-lfs, and build essentials
+RUN apt-get update && apt-get install -y git git-lfs build-essential && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first
 COPY requirements.txt .
