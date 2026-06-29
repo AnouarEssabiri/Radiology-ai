@@ -22,6 +22,9 @@ datasets/processed/reports/
 datasets/processed/*.pkl
 datasets/processed/*.json
 datasets/chest_xray/
+tests/*.jpg
+tests/*.jpeg
+tests/*.png
 
 # Model checkpoints (large)
 ai_model/checkpoints/*.pth
