@@ -13,21 +13,23 @@ venv/
 env/
 .venv/
 .env/
-.env.docker.example
-.env.example
+# Keep example env files in git
+!.env.docker.example
+!.env.example
 # Data (large files)
 datasets/raw/
 datasets/processed/images/
 datasets/processed/reports/
-datasets/processed/*.pkl
-datasets/processed/*.json
+# Keep vocab and annotations (small, required)
+!datasets/processed/vocab.pkl
+!datasets/processed/annotations.json
 datasets/chest_xray/
 tests/*.jpg
 tests/*.jpeg
 tests/*.png
 
-# Model checkpoints (large)
-ai_model/checkpoints/*.pth
+# Model checkpoints (handled by Git LFS)
+# ai_model/checkpoints/*.pth
 
 # Uploads / Outputs
 backend/uploads/
