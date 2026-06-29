@@ -7,7 +7,12 @@
       "**/*.py",
       "**/*.yaml",
       "**/*.txt",
-      "**/*.html"
+      "**/*.html",
+      ".gitattributes",
+      ".gitignore",
+      "datasets/processed/vocab.pkl",
+      "datasets/processed/annotations.json",
+      "ai_model/checkpoints/*.pth"
     ]
   },
   "deploy": {
