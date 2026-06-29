@@ -1,7 +1,10 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "DOCKERFILE",
+    "builder": "NIXPACKS",
+    "nixpacks": {
+      "install": "apt-get update && apt-get install -y build-essential && pip install -r requirements.txt"
+    },
     "watchPatterns": [
       "**/*.py",
       "**/*.yaml",
@@ -11,11 +14,11 @@
       ".gitignore",
       "datasets/processed/vocab.pkl",
       "datasets/processed/annotations.json",
-      "ai_model/checkpoints/*.pth",
-      "Dockerfile"
+      "ai_model/checkpoints/*.pth"
     ]
   },
   "deploy": {
+    "startCommand": "uvicorn backend.main:app --host 0.0.0.0 --port $PORT",
     "healthcheckPath": "/healthz",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
