@@ -95,7 +95,7 @@ class RadiologyInferenceEngine:
         if not os.path.exists(path):
             logger.warning("No checkpoint found at %s – running with random weights.", path)
             return
-        ckpt = torch.load(path, map_location=self.device)
+        ckpt = torch.load(path, map_location=self.device, weights_only=False)
         state = ckpt.get("model_state", ckpt)
         self.model.load_state_dict(state, strict=False)
 
